@@ -1,0 +1,24 @@
+---
+- name: Install LAMP stack on Ubuntu
+  hosts: all
+  become: true
+  tasks:
+  - name: Update package lists
+    apt:
+      update_cache: true
+  - name: Install Apache
+    apt:
+      name: apache2
+      state: present
+  - name: Install PHP
+    apt:
+      name: php
+      state: present
+  - name: Install MySQL server
+    apt:
+      name: mysql-server
+      state: present
+  - name: Start Apache
+    service:
+      name: apache2
+      state: started
