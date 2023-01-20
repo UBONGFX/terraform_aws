@@ -14,10 +14,6 @@
     apt:
       name: php
       state: present
-  - name: Install MySQL server
-    apt:
-      name: mysql-server
-      state: present
   - name: Start Apache
     service:
       name: apache2

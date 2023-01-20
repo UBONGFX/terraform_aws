@@ -1,19 +1,12 @@
 provider "aws" {
   region = "eu-central-1"
-
 }
-# V1
-# resource "aws_instance" "ec2-dev" {
-#   ami                         = "ami-0039da1f3917fa8e3"
-#   instance_type               = "t3.nano"
-#   vpc_security_group_ids      = ["sg-09b375415c4fc1768"]
-#   subnet_id                   = "subnet-0a890b1d4fb6de4e4"
-#   key_name                    = "admin-dev-test"
-#   associate_public_ip_address = true
-#   tags = {
-#     Name = "ec2-dev"
-#   }
-# }
+
+locals {
+  ssh_user         = "ubuntu"
+  key_name         = "admin-dev-test"
+  private_key_path = "~/.ssh/admin-dev-test.pem"
+}
 
 resource "aws_security_group" "example" {
   name        = "hood-dev"
@@ -54,14 +47,33 @@ resource "aws_security_group" "example" {
 
 
 resource "aws_instance" "ec2-dev" {
-  ami                    = "ami-03e08697c325f02ab" #ami-0a261c0e5f51090b1 ami-0039da1f3917fa8e3
-  instance_type          = "t3.nano"
-  vpc_security_group_ids = ["sg-0341f3d16d4abdf27"]
-  #   vpc_security_group_ids = [aws_security_group.example.id]
-  #   subnet_id                   = "subnet-0099b2c013769a3ff"
-  key_name                    = "admin-dev-test"
+  ami                         = "ami-03e08697c325f02ab"
+  instance_type               = "t3.nano"
+  vpc_security_group_ids      = ["sg-0341f3d16d4abdf27"]
+  key_name                    = local.key_name
   associate_public_ip_address = true
   tags = {
     Name = "ec2-dev"
   }
+
+  provisioner "remote-exec" {
+
+    inline = ["echo 'Wait until ssh is ready'"]
+
+    connection {
+      type        = "ssh"
+      user        = local.ssh_user
+      private_key = file(local.private_key_path)
+      host        = aws_instance.ec2-dev.public_ip
+    }
+  }
+
+  provisioner "local-exec" {
+    command = "ansible-playbook -i ${aws_instance.ec2-dev.public_ip}, --private-key ${local.private_key_path} --user ${local.ssh_user} playbooks/nginx.yaml"
+    # --key-file ~/.ssh/admin-dev-test.pem -i ./hosts.ini playbooks/nginx.yaml"
+  }
+}
+
+output "ec2-dev_ip" {
+  value = aws_instance.ec2-dev.public_ip
 }
