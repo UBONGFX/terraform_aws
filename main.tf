@@ -69,8 +69,7 @@ resource "aws_instance" "ec2-dev" {
   }
 
   provisioner "local-exec" {
-    command = "ansible-playbook -i ${aws_instance.ec2-dev.public_ip}, --private-key ${local.private_key_path} --user ${local.ssh_user} playbooks/nginx.yaml"
-    # --key-file ~/.ssh/admin-dev-test.pem -i ./hosts.ini playbooks/nginx.yaml"
+    command = "ansible-playbook -i ${aws_instance.ec2-dev.public_ip}, --private-key ${local.private_key_path} --user ${local.ssh_user} playbooks/deploy.yaml"
   }
 }
 
