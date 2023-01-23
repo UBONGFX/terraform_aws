@@ -1,13 +1,17 @@
-variable "sg_name" {
-  default = "hood-dev-sg"
-}
-
 variable "ec2_name" {
   default = "ec2-dev"
 }
 
+variable "ec2_ami" {
+  default = "ami-03e08697c325f02ab"
+}
+
 variable "ec2_instance_type" {
   default = "t3.nano"
+}
+
+variable "sg_name" {
+  default = "hood-dev-sg"
 }
 
 variable "ssh_user" {

@@ -41,7 +41,7 @@ resource "aws_security_group" "sg-hood" {
 
 
 resource "aws_instance" "ec2-instance" {
-  ami                         = "ami-03e08697c325f02ab"
+  ami                         = var.ec2_ami
   instance_type               = var.ec2_instance_type
   vpc_security_group_ids      = ["sg-0341f3d16d4abdf27"]
   key_name                    = var.key_name
