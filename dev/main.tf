@@ -2,8 +2,8 @@ provider "aws" {
   region = "eu-central-1"
 }
 
-resource "aws_security_group" "example" {
-  name        = "hood-dev"
+resource "aws_security_group" "sg-hood" {
+  name        = var.sg_name
   description = "Allow specific inbound and all outbound traffic"
 
   ingress {
@@ -40,14 +40,14 @@ resource "aws_security_group" "example" {
 }
 
 
-resource "aws_instance" "ec2-dev" {
+resource "aws_instance" "ec2-instance" {
   ami                         = "ami-03e08697c325f02ab"
-  instance_type               = "t3.nano"
+  instance_type               = var.ec2_instance_type
   vpc_security_group_ids      = ["sg-0341f3d16d4abdf27"]
   key_name                    = var.key_name
   associate_public_ip_address = true
   tags = {
-    Name = "ec2-dev"
+    Name = var.ec2_name
   }
 
   provisioner "remote-exec" {
@@ -58,11 +58,11 @@ resource "aws_instance" "ec2-dev" {
       type        = "ssh"
       user        = var.ssh_user
       private_key = file(var.private_key_path)
-      host        = aws_instance.ec2-dev.public_ip
+      host        = aws_instance.ec2-instance.public_ip
     }
   }
 
   provisioner "local-exec" {
-    command = "cd ansible && ansible-playbook -i ${aws_instance.ec2-dev.public_ip}, --private-key ${var.private_key_path} --user ${var.ssh_user} playbooks/deploy.yaml"
+    command = "cd ../ansible && ansible-playbook -i ${aws_instance.ec2-instance.public_ip}, --private-key ${var.private_key_path} --user ${var.ssh_user} ../ansible/playbooks/deploy.yaml"
   }
 }
