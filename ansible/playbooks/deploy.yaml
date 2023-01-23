@@ -11,7 +11,7 @@
 
   - name: Copy files
     copy:
-      src: ../src/
+      src: ../../src/
       dest: /var/www/html/
       owner: www-data
       group: www-data
